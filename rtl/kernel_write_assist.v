@@ -67,12 +67,20 @@ module kernel_write_assist #(
 
     generate
         if (DATA_WIDTH > 0) begin : gen3
-            reg [DATA_WIDTH-1:0] data_reg[0:DIVIDEND_WIDTH/2];
+            reg  [DATA_WIDTH-1:0] data_reg[0:DIVIDEND_WIDTH/2];
             assign o_data = data_reg[DIVIDEND_WIDTH/2];
 
             for (i = 0; i < DIVIDEND_WIDTH / 2 + 1; i = i + 1) begin : gen4
-                always @ (posedge clk) begin
-                    data_reg[i] <= i == 0 ? i_data : data_reg[i-1];
+                wire [DATA_WIDTH-1:0] data_wire;
+                if (i == 0) begin : gen6
+                    assign data_wire = i_data;
+                end
+                else begin : gen7
+                    assign data_wire = data_reg[i-1];
+                end
+
+                always @(posedge clk) begin
+                    data_reg[i] <= data_wire;
                 end
             end
         end
