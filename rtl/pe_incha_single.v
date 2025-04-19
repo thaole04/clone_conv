@@ -48,7 +48,7 @@ module pe_incha_single #(
     output                                     pe_ack;
     input [8*IN_CHANNEL*KERNEL_PTS-1:0]        i_data;
     input                                      i_valid;
-    input [15:0]                               weight_wr_data;
+    input [31:0]                               weight_wr_data;
     input [31:0]                               weight_wr_addr;
     input                                      weight_wr_en;
     input                                      clk;
@@ -149,7 +149,7 @@ module pe_incha_single #(
     );
 
     // Bias ram
-    wire signed [15:0] bias;
+    wire signed [23:0] bias;
 
     reg  [$clog2(OUT_CHANNEL)-1:0] bias_cnt;
     wire                           bias_cnt_en;
@@ -165,7 +165,7 @@ module pe_incha_single #(
     end
 
     block_ram_single_port #(
-        .DATA_WIDTH      (16),
+        .DATA_WIDTH      (32),
         .DEPTH           (OUT_CHANNEL),
         .RAM_STYLE       ("auto"),
         .OUTPUT_REGISTER ("true")
@@ -180,11 +180,11 @@ module pe_incha_single #(
     );
 
     // MACC co-efficient reg
-    reg signed [15:0] macc_coeff;
+    reg signed [16:0] macc_coeff;
 
     always @ (posedge clk) begin
         if (weight_wr_en && weight_wr_addr == MACC_COEFF_BASE_ADDR) begin
-            macc_coeff <= weight_wr_data;
+            macc_coeff <= {1'b0, weight_wr_data[15:0]};
         end
     end
 
@@ -230,8 +230,8 @@ module pe_incha_single #(
     ) u_macc_single (
         .o_data     (macc_data_out),
         .o_valid    (macc_valid_o),
-        .i_data_a   (kernel),
-        .i_data_b   (i_data_reg_pipeline),
+        .i_data_a   (i_data_reg_pipeline),
+        .i_data_b   (kernel),
         .i_valid    (macc_valid_i_pipeline),
         .clk        (clk),
         .rst_n      (rst_n)
@@ -257,7 +257,7 @@ module pe_incha_single #(
     end
 
     // MACC co-efficient
-    reg signed [MACC_OUTPUT_DATA_WIDTH+16-1:0] coeff_prod;
+    reg signed [MACC_OUTPUT_DATA_WIDTH+17-1:0] coeff_prod;
     reg                                        coeff_valid;
 
     always @ (posedge clk) begin
@@ -276,15 +276,15 @@ module pe_incha_single #(
     end
 
     // Bias
-    wire signed [23:0]                          bias_adjusted = {bias, {8{1'b0}}};
-    reg  signed [MACC_OUTPUT_DATA_WIDTH+16-1:0] bias_sum;
+    wire signed [23:0]                          bias_adjusted = bias[23:0];
+    reg  signed [MACC_OUTPUT_DATA_WIDTH+17-1:0] bias_sum;
     reg                                         bias_valid;
 
     assign bias_cnt_en = macc_valid_o;
 
     always @ (posedge clk) begin
         if (coeff_valid) begin
-            bias_sum <= coeff_prod + bias_adjusted;
+            bias_sum <= coeff_prod + bias_adjusted + 16'h8000;
         end
     end
 
@@ -303,8 +303,10 @@ module pe_incha_single #(
 
     generate
         if (OUTPUT_MODE == "relu") begin : gen0
-            assign obuffer_data = bias_sum < 0 ? 0 : ((bias_sum[23] || bias_sum[22:16] == {7{1'b1}}) ? 127 : (bias_sum[23:16] + (bias_sum[15] & |bias_sum[14:12])));
             assign obuffer_valid  = bias_valid;
+            assign obuffer_data   = bias_sum[17+MACC_OUTPUT_DATA_WIDTH-1] ? 8'h00 :
+                                    (|bias_sum[17+MACC_OUTPUT_DATA_WIDTH-1:24]) ? 8'hFF :
+                                    {bias_sum[23:16]};
         end
 
         else if (OUTPUT_MODE == "dequant" || OUTPUT_MODE == "sigmoid") begin : gen1

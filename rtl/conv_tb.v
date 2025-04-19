@@ -38,7 +38,7 @@ module conv_tb;
     reg [8*IN_CHANNEL-1:0]           i_data;
     reg                              i_valid;
     reg                              fifo_almost_full;
-    reg [15:0]                       weight_wr_data;
+    reg [31:0]                       weight_wr_data;
     reg [31:0]                       weight_wr_addr;
     reg                              weight_wr_en;
     
@@ -124,7 +124,7 @@ module conv_tb;
         for (i = 0; i < IN_HEIGHT; i = i + 1) begin
             for (j = 0; j < IN_WIDTH; j = j + 1) begin
                 test_data_buffer[i*IN_WIDTH+j][7:0] = i*IN_WIDTH + j + 1;                // Kênh 1
-                test_data_buffer[i*IN_WIDTH+j][15:8] = (i*IN_WIDTH + j + 1) * 10;        // Kênh 2
+                test_data_buffer[i*IN_WIDTH+j][15:8] = (i*IN_WIDTH + j + 1) * 1;        // Kênh 2
             end
         end
 
@@ -145,27 +145,48 @@ module conv_tb;
                         @(posedge clk);
                         weight_wr_addr = KERNEL_BASE_ADDR + oc * (KERNEL_0 * KERNEL_1 * IN_CHANNEL) 
                                         + c * (KERNEL_0 * KERNEL_1) + i * KERNEL_1 + j;
-                        weight_wr_data = {8'h0, 8'h01 << oc};  // 1 cho kênh đầu ra 0, 2 cho kênh đầu ra 1
+                        if (oc == 0) weight_wr_data = i*3 + j;  // -1 cho kênh đầu ra 0,
+                        if (oc == 1) weight_wr_data = i*3 + j + 9;  //  2 cho kênh đầu ra 1
+
                         weight_wr_en = 1;
-                        #CLK_PERIOD;
+                        //#CLK_PERIOD;
                     end
                 end
             end
         end
         
+        
+        
+        repeat (10) @(posedge clk);
+        weight_wr_en = 0;
+        @(posedge clk);
+        
+        
+        
+        
         // Nạp bias (2 giá trị)
         for (i = 0; i < OUT_CHANNEL; i = i + 1) begin
             @(posedge clk);
             weight_wr_addr = BIAS_BASE_ADDR + i;
-            weight_wr_data = 16'h0010;  // bias = 16
+            weight_wr_data = 32'h0001_0000;  // bias = 16
             weight_wr_en = 1;
-            #CLK_PERIOD;
+            //#CLK_PERIOD;
         end
         
+//        @(posedge clk);
+//        @(posedge clk);
+//        @(posedge clk);
+//        weight_wr_en = 0;
+        
+//        $stop;
         // Nạp MACC coeff (1 giá trị)
+
         @(posedge clk);
+        weight_wr_en = 0;
+        @(posedge clk);
+
         weight_wr_addr = MACC_COEFF_BASE_ADDR;
-        weight_wr_data = 16'h0400;  // coeff = 1.0 (nhân 256)
+        weight_wr_data = 16'h8000;  // coeff = 0.5 (nhân 256)
         weight_wr_en = 1;
         #CLK_PERIOD;
         
@@ -186,7 +207,16 @@ module conv_tb;
         
         // Trễ một chút trước khi gửi dữ liệu
         #(CLK_PERIOD*10);
-        
+        // test
+        @(posedge clk);
+        // Chỉ gửi dữ liệu khi FIFO không gần đầy và chỉ đọc khi được cho phép
+        if (!fifo_almost_full && (data_idx < IN_HEIGHT*IN_WIDTH)) begin
+            i_data = 16'h5555;
+            i_valid = 1;
+        end else begin
+            i_valid = 0;
+        end
+
         // Gửi dữ liệu từ buffer
         for (i = 0; i < IN_HEIGHT; i = i + 1) begin
             for (j = 0; j < IN_WIDTH; j = j + 1) begin
@@ -200,9 +230,9 @@ module conv_tb;
                     i_valid = 0;
                 end
                 
-                // Mô phỏng FIFO gần đầy với xác suất thấp
-                if ($random % 20 == 0) fifo_almost_full = 1;
-                else fifo_almost_full = 0;
+//                // Mô phỏng FIFO gần đầy với xác suất thấp
+//                if ($random % 20 == 0) fifo_almost_full = 1;
+//                else fifo_almost_full = 0;
             end
         end
         

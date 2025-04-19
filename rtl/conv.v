@@ -53,7 +53,7 @@ module conv #(
     input  [8*IN_CHANNEL-1:0]                  i_data;
     input                                      i_valid;
     input                                      fifo_almost_full;
-    input  [15:0]                              weight_wr_data;
+    input  [31:0]                              weight_wr_data;
     input  [31:0]                              weight_wr_addr;
     input                                      weight_wr_en;
     input                                      clk;
