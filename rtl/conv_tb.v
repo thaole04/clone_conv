@@ -6,8 +6,8 @@ module conv_tb;
     localparam CLK_PERIOD = 10;  // 100MHz
     
     // Conv parameters (giữ nhỏ để dễ kiểm tra)
-    localparam IN_WIDTH     = 8;
-    localparam IN_HEIGHT    = 8;
+    localparam IN_WIDTH     = 4;
+    localparam IN_HEIGHT    = 4;
     localparam KERNEL_0     = 3;
     localparam KERNEL_1     = 3;
     localparam DILATION_0   = 1;
@@ -217,24 +217,47 @@ module conv_tb;
             i_valid = 0;
         end
 
-        // Gửi dữ liệu từ buffer
-        for (i = 0; i < IN_HEIGHT; i = i + 1) begin
-            for (j = 0; j < IN_WIDTH; j = j + 1) begin
-                @(posedge clk);
-                // Chỉ gửi dữ liệu khi FIFO không gần đầy và chỉ đọc khi được cho phép
-                if (!fifo_almost_full && (data_idx < IN_HEIGHT*IN_WIDTH)) begin
-                    i_data = test_data_buffer[data_idx];
-                    i_valid = 1;
-                    data_idx = data_idx + 1;
-                end else begin
-                    i_valid = 0;
-                end
+//        // Gửi dữ liệu từ buffer
+//        for (i = 0; i < IN_HEIGHT; i = i + 1) begin
+//            for (j = 0; j < IN_WIDTH; j = j + 1) begin
                 
-//                // Mô phỏng FIFO gần đầy với xác suất thấp
-//                if ($random % 20 == 0) fifo_almost_full = 1;
-//                else fifo_almost_full = 0;
-            end
-        end
+//                // Chỉ gửi dữ liệu khi FIFO không gần đầy và chỉ đọc khi được cho phép
+//                while (!fifo_rd_en);
+//                @(posedge clk);
+//                if (!fifo_almost_full && (data_idx < IN_HEIGHT*IN_WIDTH)) begin
+//                    i_data = test_data_buffer[data_idx];
+//                    i_valid = 1;
+//                    data_idx = data_idx + 1;
+//                end else begin
+//                    i_valid = 0;
+//                end
+                
+////                // Mô phỏng FIFO gần đầy với xác suất thấp
+////                if ($random % 20 == 0) fifo_almost_full = 1;
+////                else fifo_almost_full = 0;
+//            end
+//        end
+  while (data_idx < IN_HEIGHT*IN_WIDTH) begin
+    @(posedge clk);
+    if (fifo_rd_en) begin
+      // Chỉ gửi khi FIFO không gần đầy
+      if (!fifo_almost_full) begin
+        i_data      = test_data_buffer[data_idx];
+        i_valid     = 1;
+        data_idx    = data_idx + 1;
+      end
+      else begin
+        // FIFO almost full: tạm nghỉ
+        i_valid = 0;
+      end
+    end
+    else begin
+      // FIFO không cho đọc: giữ hoặc hạ valid
+      //i_valid = 0;
+      // i_data có thể để nguyên, hoặc gán 0 nếu muốn
+    end
+  end
+
         
         // Tắt tín hiệu hợp lệ sau khi gửi hết dữ liệu
         i_valid = 0;
