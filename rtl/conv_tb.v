@@ -139,12 +139,12 @@ module conv_tb;
         // Nạp kernel (3x3x2x2 = 36 trọng số)
         // Kernel đơn giản: tất cả trọng số là 1 cho kernel đầu tiên, 2 cho kernel thứ hai
         for (oc = 0; oc < OUT_CHANNEL; oc = oc + 1) begin
-            for (c = 0; c < IN_CHANNEL; c = c + 1) begin
-                for (i = 0; i < KERNEL_0; i = i + 1) begin
-                    for (j = 0; j < KERNEL_1; j = j + 1) begin
+            for (i = 0; i < KERNEL_0; i = i + 1) begin
+                for (j = 0; j < KERNEL_1; j = j + 1) begin
+                    for (c = 0; c < IN_CHANNEL; c = c + 1) begin
                         @(posedge clk);
                         weight_wr_addr = KERNEL_BASE_ADDR + oc * (KERNEL_0 * KERNEL_1 * IN_CHANNEL) 
-                                        + c * (KERNEL_0 * KERNEL_1) + i * KERNEL_1 + j;
+                                        + i * (IN_CHANNEL * KERNEL_1) + j * IN_CHANNEL + c;
                         if (oc == 0) weight_wr_data = i*3 + j;  // -1 cho kênh đầu ra 0,
                         if (oc == 1) weight_wr_data = i*3 + j + 9;  //  2 cho kênh đầu ra 1
 
@@ -168,7 +168,7 @@ module conv_tb;
         for (i = 0; i < OUT_CHANNEL; i = i + 1) begin
             @(posedge clk);
             weight_wr_addr = BIAS_BASE_ADDR + i;
-            weight_wr_data = 32'h0001_0000;  // bias = 16
+            weight_wr_data = 32'h0001_0000;  // bias = 1
             weight_wr_en = 1;
             //#CLK_PERIOD;
         end
@@ -240,21 +240,18 @@ module conv_tb;
   while (data_idx < IN_HEIGHT*IN_WIDTH) begin
     @(posedge clk);
     if (fifo_rd_en) begin
-      // Chỉ gửi khi FIFO không gần đầy
       if (!fifo_almost_full) begin
         i_data      = test_data_buffer[data_idx];
         i_valid     = 1;
         data_idx    = data_idx + 1;
       end
       else begin
-        // FIFO almost full: tạm nghỉ
         i_valid = 0;
       end
     end
     else begin
-      // FIFO không cho đọc: giữ hoặc hạ valid
       //i_valid = 0;
-      // i_data có thể để nguyên, hoặc gán 0 nếu muốn
+   
     end
   end
 
