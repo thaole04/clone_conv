@@ -1,11 +1,8 @@
 `timescale 1ns / 1ps
 
 module model (
-    output [16*4-1:0] o_data_cls,
-    output [16*4-1:0] o_data_vertical,
-    output            o_valid_cls,
-    output            o_valid_vertical,
-    output            fifo_rd_en,
+    input             clk,
+    input             rst_n,
     input  [8*2-1:0]  i_data,
     input             i_valid,
     input             cls_almost_full,
@@ -13,8 +10,11 @@ module model (
     input  [31:0]     weight_wr_data,
     input  [31:0]     weight_wr_addr,
     input             weight_wr_en,
-    input             clk,
-    input             rst_n
+    output [16*4-1:0] o_data_cls,
+    output [16*4-1:0] o_data_vertical,
+    output            o_valid_cls,
+    output            o_valid_vertical,
+    output            fifo_rd_en
 );
 
     // Encoder stage 0 conv 0
@@ -195,7 +195,7 @@ module model (
     );
 
     // Encoder stage 1 conv 0
-    wire [8*1-1:0] o_data_enc_3;
+    wire [8*2-1:0] o_data_enc_3;
     wire o_valid_enc_3;
     wire fifo_almost_full_enc_3;
 
@@ -214,11 +214,11 @@ module model (
         .STRIDE_0              (2),
         .STRIDE_1              (2),
         .IN_CHANNEL            (2),
-        .OUT_CHANNEL           (1),
+        .OUT_CHANNEL           (2),
         .KERNEL_BASE_ADDR      (130),  // Num kernel: 2304
-        .BIAS_BASE_ADDR        (132),  // Num bias: 16
-        .MACC_COEFF_BASE_ADDR  (133),  // Num macc_coeff: 1
-        .LAYER_SCALE_BASE_ADDR (134)
+        .BIAS_BASE_ADDR        (134),  // Num bias: 16
+        .MACC_COEFF_BASE_ADDR  (136),  // Num macc_coeff: 1
+        .LAYER_SCALE_BASE_ADDR (137)
     ) u_enc_3 (
         .o_data                (o_data_enc_3),
         .o_valid               (o_valid_enc_3),
@@ -238,7 +238,7 @@ module model (
     wire fifo_rd_en_enc_3;
 
     fifo_single_read #(
-        .DATA_WIDTH        (8 * 1),
+        .DATA_WIDTH        (8 * 2),
         .DEPTH             (1),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_enc_3 (
