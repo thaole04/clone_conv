@@ -45,6 +45,18 @@ module tb_model;
         .clk(clk),
         .rst_n(rst_n)
     );
+    // Khởi tạo FIFO
+    fifo_single_read fifo (
+        .rd_data(),
+        .empty(),
+        .full(),
+        .almost_full(),
+        .wr_data(o_data),
+        .wr_en(o_valid),
+        .rd_en(),
+        .rst_n(rst_n),
+        .clk(clk)
+    );
     
     // Khởi tạo xung clock
     initial begin
@@ -110,7 +122,6 @@ module tb_model;
         weight_wr_en = 0;
         // Đợi vài chu kỳ để đảm bảo trọng số được nạp hoàn tất
         repeat(10) @(posedge clk);
-        $stop;
         fifo_rd_en = 1;
         // Giai đoạn 2: Cung cấp dữ liệu đầu vào
         $display("Giai đoạn 2: Cung cấp dữ liệu đầu vào");
