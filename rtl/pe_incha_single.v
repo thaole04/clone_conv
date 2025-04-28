@@ -276,7 +276,7 @@ module pe_incha_single #(
     end
 
     // Bias
-    wire signed [23:0]                          bias_adjusted = bias[23:0];
+    wire signed [MACC_OUTPUT_DATA_WIDTH+17-1:0] bias_adjusted = {{MACC_OUTPUT_DATA_WIDTH+17-24{bias[23]}} ,bias[23:0]};
     reg  signed [MACC_OUTPUT_DATA_WIDTH+17-1:0] bias_sum;
     reg                                         bias_valid;
 
@@ -305,8 +305,8 @@ module pe_incha_single #(
         if (OUTPUT_MODE == "relu") begin : gen0
             assign obuffer_valid  = bias_valid;
             assign obuffer_data   = bias_sum[17+MACC_OUTPUT_DATA_WIDTH-1] ? 8'h00 :
-                                    (|bias_sum[17+MACC_OUTPUT_DATA_WIDTH-1:24]) ? 8'hFF :
-                                    {bias_sum[23:16]};
+                                    (|bias_sum[17+MACC_OUTPUT_DATA_WIDTH-1:23]) ? 8'h7F :
+                                    {bias_sum[22:16]};
         end
 
         else if (OUTPUT_MODE == "dequant" || OUTPUT_MODE == "sigmoid") begin : gen1
