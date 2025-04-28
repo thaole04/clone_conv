@@ -6,23 +6,14 @@ module model_test_tb;
     localparam CLK_PERIOD = 10;  // 100MHz
     
     // Conv parameters (giữ nhỏ để dễ kiểm tra)
-    localparam IN_WIDTH     = 4;
-    localparam IN_HEIGHT    = 4;
-    localparam DILATION_0   = 1;
-    localparam DILATION_1   = 1;
-    localparam PADDING_0    = 1;
-    localparam PADDING_1    = 1;
-    localparam STRIDE_0     = 1;
-    localparam STRIDE_1     = 1;
-    localparam OUTPUT_MODE  = "relu";
-    localparam UNROLL_MODE  = "incha";
-    localparam COMPUTE_FACTOR = "single";
-
+    localparam IN_WIDTH     = 256;
+    localparam IN_HEIGHT    = 256;
+    localparam PIXELS = IN_WIDTH*IN_HEIGHT;
     // Conv param
     localparam KERNEL_0_0     = 3;
     localparam KERNEL_1_0     = 3;
-    localparam IN_CHANNEL_0   = 2;
-    localparam OUT_CHANNEL_0  = 2;
+    localparam IN_CHANNEL_0   = 3;
+    localparam OUT_CHANNEL_0  = 16;
                                  
     localparam KERNEL_0_1     = 1;
     localparam KERNEL_1_1     = 1;
@@ -61,10 +52,13 @@ module model_test_tb;
     // Bộ đếm và flags
     integer                          i, j, k, c, oc;
     reg                              weights_loaded;
-    reg [8*IN_CHANNEL_0-1:0]           test_data_buffer[0:IN_HEIGHT*IN_WIDTH-1];
+    reg [8*3-1:0]                    test_data_buffer[0:IN_HEIGHT*IN_WIDTH-1];
     integer                          data_idx;
     integer                          cycle_count;
     integer                          output_count;
+    //
+integer fd, scan_cnt, idx;
+integer r0, r1, r2;
 
     // Khởi tạo UUT
     model dut
@@ -112,235 +106,110 @@ module model_test_tb;
         data_idx = 0;
         cycle_count = 0;
         output_count = 0;
-        
+////////////////////////////////////////////////////////////////////////////////////
         // Điền buffer dữ liệu thử nghiệm với pattern dễ dàng nhận biết
-        // Kênh 1: pattern 1, 2, 3, ...
-        // Kênh 2: pattern 10, 20, 30, ...
-        for (i = 0; i < IN_HEIGHT; i = i + 1) begin
-            for (j = 0; j < IN_WIDTH; j = j + 1) begin
-                test_data_buffer[i*IN_WIDTH+j][7:0] = i*IN_WIDTH + j + 1;                // Kênh 1
-                test_data_buffer[i*IN_WIDTH+j][15:8] = (i*IN_WIDTH + j + 1) * 1;        // Kênh 2
-            end
-        end
+        // to do test_data_buffer
 
+
+///////////////////////////////////////////////////////////////////////////////////
         // Reset
         #(CLK_PERIOD*5);
-        rst_n = 1;
+        rst_n <= 1;
         #(CLK_PERIOD*5);
         
         // Nạp trọng số
         $display("Loading weights...");
-        
-        //----------------- Conv_0 Nạp kernel (3x3x2x2 = 36 trọng số) --------
+        // to do
+        //----------------- Conv_0 Nạp kernel (3x3x3x16 = 432 trọng số) --------
         //--------------------------------------------------------------------
+        fd = $fopen("/home/tuananh/alpr/QuantLaneNet_original/DA/final_detect_model/try3_minimal/conv0_kernel_hex.txt", "r");
+        if (fd == 0) begin
+            $display("ERROR: Không mở được file conv0_kernel_hex.txt");
+            $finish;
+        end
         for (oc = 0; oc < OUT_CHANNEL_0; oc = oc + 1) begin
             for (i = 0; i < KERNEL_0_0; i = i + 1) begin
                 for (j = 0; j < KERNEL_1_0; j = j + 1) begin
                     for (c = 0; c < IN_CHANNEL_0; c = c + 1) begin
                         @(posedge clk);
-                        weight_wr_addr = 0 + oc * (KERNEL_0_0 * KERNEL_1_0 * IN_CHANNEL_0) 
+                        weight_wr_addr <= 0 + oc * (KERNEL_0_0 * KERNEL_1_0 * IN_CHANNEL_0) 
                                         + i * (IN_CHANNEL_0 * KERNEL_1_0) + j * IN_CHANNEL_0 + c;
-                        weight_wr_data = i*3 + j + oc;
+                        scan_cnt <= $fscanf(fd, "%h\n", r0);
+                        weight_wr_data <= {{24{r0[7]}} ,r0[7:0]};
 
-                        weight_wr_en = 1;
+                        weight_wr_en <= 1;
                         //#CLK_PERIOD;
                     end
                 end
             end
         end
-        //----------------- Conv_1 Nạp kernel (3x3x2x2 = 36 trọng số) --------
-        //--------------------------------------------------------------------
-        for (oc = 0; oc < OUT_CHANNEL_1; oc = oc + 1) begin
-            for (i = 0; i < KERNEL_0_1; i = i + 1) begin
-                for (j = 0; j < KERNEL_1_1; j = j + 1) begin
-                    for (c = 0; c < IN_CHANNEL_1; c = c + 1) begin
-                        @(posedge clk);
-                        weight_wr_addr = 40 + oc * (KERNEL_0_1 * KERNEL_1_1 * IN_CHANNEL_1) 
-                                        + i * (IN_CHANNEL_1 * KERNEL_1_1) + j * IN_CHANNEL_1 + c;
-                        weight_wr_data = i*3 + j + oc;
-
-                        weight_wr_en = 1;
-                        //#CLK_PERIOD;
-                    end
-                end
-            end
-        end
-        //----------------- Conv_2 Nạp kernel (3x3x2x2 = 36 trọng số) --------
-        //--------------------------------------------------------------------
-        for (oc = 0; oc < OUT_CHANNEL_2; oc = oc + 1) begin
-            for (i = 0; i < KERNEL_0_2; i = i + 1) begin
-                for (j = 0; j < KERNEL_1_2; j = j + 1) begin
-                    for (c = 0; c < IN_CHANNEL_2; c = c + 1) begin
-                        @(posedge clk);
-                        weight_wr_addr = 54 + oc * (KERNEL_0_2 * KERNEL_1_2 * IN_CHANNEL_2) 
-                                        + i * (IN_CHANNEL_2 * KERNEL_1_2) + j * IN_CHANNEL_2 + c;
-                        weight_wr_data = i*3 + j + oc;  
-
-                        weight_wr_en = 1;
-                        //#CLK_PERIOD;
-                    end
-                end
-            end
-        end
-        //----------------- Conv_3 Nạp kernel (3x3x2x2 = 36 trọng số) --------
-        //--------------------------------------------------------------------
-        for (oc = 0; oc < OUT_CHANNEL_3; oc = oc + 1) begin
-            for (i = 0; i < KERNEL_0_3; i = i + 1) begin
-                for (j = 0; j < KERNEL_1_3; j = j + 1) begin
-                    for (c = 0; c < IN_CHANNEL_3; c = c + 1) begin
-                        @(posedge clk);
-                        weight_wr_addr = 130 + oc * (KERNEL_0_3 * KERNEL_1_3 * IN_CHANNEL_3) 
-                                        + i * (IN_CHANNEL_3 * KERNEL_1_3) + j * IN_CHANNEL_3 + c;
-                        weight_wr_data = i*3 + j + oc;   
-
-                        weight_wr_en = 1;
-                        //#CLK_PERIOD;
-                    end
-                end
-            end
-        end
-        
-        
+   
         
         // Nạp bias conv_0 (2 giá trị)
         @(posedge clk);
-        weight_wr_en = 0;
+        weight_wr_en <= 0;
         @(posedge clk);
         
+        fd = $fopen("/home/tuananh/alpr/QuantLaneNet_original/DA/final_detect_model/try3_minimal/conv0_bias_hex.txt", "r");
+        if (fd == 0) begin
+            $display("ERROR: Không mở được file conv0_bias_hex.txt");
+            $finish;
+        end
         for (i = 0; i < OUT_CHANNEL_0; i = i + 1) begin
             @(posedge clk);
-            weight_wr_addr = 36 + i;
-            weight_wr_data = 32'h0001_0000;  // bias = 1
-            weight_wr_en = 1;
+            weight_wr_addr <= 3*3*3*16 + i;
+            scan_cnt <= $fscanf(fd, "%h\n", r0);
+            weight_wr_data <= {r0[31:0]};  // bias = 1
+            weight_wr_en <= 1;
             //#CLK_PERIOD;
         end
-        // Nạp bias conv_1 (2 giá trị)
-        @(posedge clk);
-        weight_wr_en = 0;
-        @(posedge clk);
-        
-        for (i = 0; i < OUT_CHANNEL_1; i = i + 1) begin
-            @(posedge clk);
-            weight_wr_addr = 48 + i;
-            weight_wr_data = 32'h0002_0000;  // bias = 2
-            weight_wr_en = 1;
-            //#CLK_PERIOD;
-        end
-        // Nạp bias conv_2 (2 giá trị)
-        @(posedge clk);
-        weight_wr_en = 0;
-        @(posedge clk);
-        
-        for (i = 0; i < OUT_CHANNEL_2; i = i + 1) begin
-            @(posedge clk);
-            weight_wr_addr = 126 + i;
-            weight_wr_data = 32'h0003_0000;  // bias = 3
-            weight_wr_en = 1;
-            //#CLK_PERIOD;
-        end
-        // Nạp bias conv_3 (2 giá trị)
-        @(posedge clk);
-        weight_wr_en = 0;
-        @(posedge clk);
-        
-        for (i = 0; i < OUT_CHANNEL_3; i = i + 1) begin
-            @(posedge clk);
-            weight_wr_addr = 134 + i;
-            weight_wr_data = 32'h0004_0000;  // bias = 4
-            weight_wr_en = 1;
-            //#CLK_PERIOD;
-        end
-        
+
         // Nạp MACC coeff conv_0 (1 giá trị)
         @(posedge clk);
-        weight_wr_en = 0;
+        weight_wr_en <= 0;
         @(posedge clk);
 
-        weight_wr_addr = 38;
-        weight_wr_data = 16'h8000;  // coeff = 0.5 (nhân 256)
-        weight_wr_en = 1;
+        weight_wr_addr <= 3*3*3*16 + 16;
+        weight_wr_data <= 32'h0000_00AB;  // coeff = 0.5 (nhân 256)
+        weight_wr_en <= 1;
         @(posedge clk);
         
         
-        // Nạp MACC coeff conv_1 (1 giá trị)
-        @(posedge clk);
-        weight_wr_en = 0;
-        @(posedge clk);
-
-        weight_wr_addr = 52;
-        weight_wr_data = 16'h8000;  // coeff = 0.5 (nhân 256)
-        weight_wr_en = 1;
-        @(posedge clk);
-
-
-        // Nạp MACC coeff conv_2 (1 giá trị)
-        @(posedge clk);
-        weight_wr_en = 0;
-        @(posedge clk);
-
-        weight_wr_addr = 128;
-        weight_wr_data = 16'h8000;  // coeff = 0.5 (nhân 256)
-        weight_wr_en = 1;
-        @(posedge clk);
-
-
-        // Nạp MACC coeff conv_3 (1 giá trị)
-        @(posedge clk);
-        weight_wr_en = 0;
-        @(posedge clk);
-
-        weight_wr_addr = 136;
-        weight_wr_data = 16'h8000;  // coeff = 0.5 (nhân 256)
-        weight_wr_en = 1;
-        @(posedge clk);
-        
-        // Nạp layer scale (1 giá trị)
-        //@(posedge clk);
-        //weight_wr_addr = ;
-        //weight_wr_data = 16'h0800;  // scale = 1.0 (nhân 256)
-        //weight_wr_en = 1;
-        //#CLK_PERIOD;
-        
-        weight_wr_en = 0;
-        weights_loaded = 1;
+        weight_wr_en <= 0;
+        weights_loaded <= 1;
         
         $display("Weights loaded successfully!");
         
         // Gửi dữ liệu đầu vào
         $display("Sending input data...");
         
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+fd = $fopen("/home/tuananh/alpr/QuantLaneNet_original/DA/final_detect_model/try3_minimal/input_int8.txt", "r");
+if (fd == 0) begin
+    $display("ERROR: Không mở được file input_int8.txt");
+    $finish;
+end
+for (idx = 0; idx < PIXELS; idx = idx + 1) begin
+    scan_cnt = $fscanf(fd, "%d,%d,%d\n", r0, r1, r2);
+    // Ghép lại thành {ch0, ch1, ch2}
+    test_data_buffer[idx] = { r0[7:0], r1[7:0], r2[7:0] };
+end
+$fclose(fd);
+
         // Trễ một chút trước khi gửi dữ liệu
         #(CLK_PERIOD*10);
         // test
         @(posedge clk);
         // Chỉ gửi dữ liệu khi FIFO không gần đầy và chỉ đọc khi được cho phép
         if (!fifo_almost_full && (data_idx < IN_HEIGHT*IN_WIDTH)) begin
-            i_data = 16'h5555;
+            i_data = 24'h55_5555;
             i_valid = 1;
         end else begin
             i_valid = 0;
         end
 
-//        // Gửi dữ liệu từ buffer
-//        for (i = 0; i < IN_HEIGHT; i = i + 1) begin
-//            for (j = 0; j < IN_WIDTH; j = j + 1) begin
-                
-//                // Chỉ gửi dữ liệu khi FIFO không gần đầy và chỉ đọc khi được cho phép
-//                while (!fifo_rd_en);
-//                @(posedge clk);
-//                if (!fifo_almost_full && (data_idx < IN_HEIGHT*IN_WIDTH)) begin
-//                    i_data = test_data_buffer[data_idx];
-//                    i_valid = 1;
-//                    data_idx = data_idx + 1;
-//                end else begin
-//                    i_valid = 0;
-//                end
-                
-////                // Mô phỏng FIFO gần đầy với xác suất thấp
-////                if ($random % 20 == 0) fifo_almost_full = 1;
-////                else fifo_almost_full = 0;
-//            end
-//        end
   while (data_idx < IN_HEIGHT*IN_WIDTH) begin
     @(posedge clk);
     if (fifo_rd_en) begin
@@ -359,7 +228,7 @@ module model_test_tb;
     end
   end
 
-        
+/////////////////////////////////////////////////////////////////////////////////////////////    
         // Tắt tín hiệu hợp lệ sau khi gửi hết dữ liệu
         i_valid = 0;
         

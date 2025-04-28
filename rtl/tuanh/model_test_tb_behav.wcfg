@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="model_test_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="model_test_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="812.000001 us"></ZoomEndTime>
+      <Cursor1Time time="0.310000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="216"></NameColumnWidth>
+      <ValueColumnWidth column_width="71"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="20" />
+   <wvobject type="group" fp_name="group16561">
+      <obj_property name="label">write weight</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/model_test_tb/weight_wr_addr">
+         <obj_property name="ElementShortName">weight_wr_addr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">weight_wr_addr[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/model_test_tb/weight_wr_data">
+         <obj_property name="ElementShortName">weight_wr_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">weight_wr_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/model_test_tb/weight_wr_en">
+         <obj_property name="ElementShortName">weight_wr_en</obj_property>
+         <obj_property name="ObjectShortName">weight_wr_en</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /bias_wr_addr">
+         <obj_property name="ElementShortName">bias_wr_addr[3:0]</obj_property>
+         <obj_property name="ObjectShortName">bias_wr_addr[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /bias_wr_en">
+         <obj_property name="ElementShortName">bias_wr_en</obj_property>
+         <obj_property name="ObjectShortName">bias_wr_en</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /weight_wr_data">
+         <obj_property name="ElementShortName">weight_wr_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">weight_wr_data[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="array" fp_name="/model_test_tb/test_data_buffer">
+      <obj_property name="ElementShortName">test_data_buffer[0:65535][23:0]</obj_property>
+      <obj_property name="ObjectShortName">test_data_buffer[0:65535][23:0]</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group426">
+      <obj_property name="label">conv_0</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /u_kernel/ram">
+         <obj_property name="ElementShortName">ram[0:15][215:0]</obj_property>
+         <obj_property name="ObjectShortName">ram[0:15][215:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /u_bias/ram">
+         <obj_property name="ElementShortName">ram[0:15][31:0]</obj_property>
+         <obj_property name="ObjectShortName">ram[0:15][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /macc_coeff">
+         <obj_property name="ElementShortName">macc_coeff[16:0]</obj_property>
+         <obj_property name="ObjectShortName">macc_coeff[16:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/model_test_tb/dut/u_fifo_enc_0/u_bram/ram">
+         <obj_property name="ElementShortName">ram[0:16383][127:0]</obj_property>
+         <obj_property name="ObjectShortName">ram[0:16383][127:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group427">
+      <obj_property name="label">conv_1</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group427">
+      <obj_property name="label">conv_2</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group427">
+      <obj_property name="label">conv_3</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/i_data">
+      <obj_property name="ElementShortName">i_data[23:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data[23:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /u_macc_single/i_data_a">
+      <obj_property name="ElementShortName">i_data_a[215:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data_a[215:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /u_macc_single/i_data_b">
+      <obj_property name="ElementShortName">i_data_b[215:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data_b[215:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /u_macc_single/i_valid">
+      <obj_property name="ElementShortName">i_valid</obj_property>
+      <obj_property name="ObjectShortName">i_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /macc_data_out">
+      <obj_property name="ElementShortName">macc_data_out[20:0]</obj_property>
+      <obj_property name="ObjectShortName">macc_data_out[20:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /macc_valid_o_reg">
+      <obj_property name="ElementShortName">macc_valid_o_reg</obj_property>
+      <obj_property name="ObjectShortName">macc_valid_o_reg</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /coeff_prod">
+      <obj_property name="ElementShortName">coeff_prod[37:0]</obj_property>
+      <obj_property name="ObjectShortName">coeff_prod[37:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /coeff_valid">
+      <obj_property name="ElementShortName">coeff_valid</obj_property>
+      <obj_property name="ObjectShortName">coeff_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /bias_adjusted">
+      <obj_property name="ElementShortName">bias_adjusted[37:0]</obj_property>
+      <obj_property name="ObjectShortName">bias_adjusted[37:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /bias_sum">
+      <obj_property name="ElementShortName">bias_sum[37:0]</obj_property>
+      <obj_property name="ObjectShortName">bias_sum[37:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /obuffer_data">
+      <obj_property name="ElementShortName">obuffer_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">obuffer_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/model_test_tb/dut/u_enc_0/\gen0.gen1.u_pe_incha_single /bias_valid">
+      <obj_property name="ElementShortName">bias_valid</obj_property>
+      <obj_property name="ObjectShortName">bias_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/model_test_tb/dut/u_enc_0/o_valid">
+      <obj_property name="ElementShortName">o_valid</obj_property>
+      <obj_property name="ObjectShortName">o_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/model_test_tb/dut/u_enc_0/o_data">
+      <obj_property name="ElementShortName">o_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data[127:0]</obj_property>
+   </wvobject>
+</wave_config>
