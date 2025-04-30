@@ -67,15 +67,11 @@ integer r0, r1, r2;
        .rst_n                (rst_n), 
        .i_data               (i_data),               
        .i_valid              (i_valid),   
-       .cls_almost_full      (),   
-       .vertical_almost_full (), 
        .weight_wr_data       (weight_wr_data),   
        .weight_wr_addr       (weight_wr_addr),   
        .weight_wr_en         (weight_wr_en),   
-       .o_data_cls           (),   
-       .o_data_vertical      (),   
-       .o_valid_cls          (),
-       .o_valid_vertical     (),
+       .o_data               (),   
+       .o_valid              (),
        .fifo_rd_en           (fifo_rd_en)
     );
     // fifo_rd_en,          Clock
