@@ -49,7 +49,7 @@ module tb_model_dma;
     end
     initial begin
         $readmemh("/home/tuananh/alpr/QuantLaneNet_original/DA/final_detect_model/try3_minimal/mem/weights.mem", weights);
-        $readmemh("/home/tuananh/alpr/QuantLaneNet_original/DA/final_detect_model/try3_minimal/mem/input.mem", input_data);
+        $readmemh("/home/tuananh/alpr/QuantLaneNet_original/DA/final_detect_model/try3_minimal/mem/input2.mem", input_data);
        // Khởi tạo
        clk   <= 0;
        @(posedge clk);
@@ -107,6 +107,7 @@ module tb_model_dma;
        repeat (100) begin
           @(posedge clk);
        end
-       $finish;
+    
+                               $finish;
     end
 endmodule

@@ -258,7 +258,7 @@ module model (
         .IN_WIDTH              (64),
         .IN_HEIGHT             (64),
         .OUTPUT_MODE           ("relu"),
-        .COMPUTE_FACTOR        ("double"),
+        .COMPUTE_FACTOR        ("single"),
         .KERNEL_0              (3),
         .KERNEL_1              (3),
         .PADDING_0             (1),
